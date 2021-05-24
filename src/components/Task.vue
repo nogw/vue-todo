@@ -1,6 +1,6 @@
 <template>
   <div class="input">
-    <input v-model="content" v-on:keyup.enter="addTodo()" type="text" name="new_task" id="new_task">
+    <input v-model="content" placeholder="New task..." v-on:keyup.enter="addTodo()" type="text" name="new_task" id="new_task">
     <button v-on:click="addTodo()"><unicon name="plus-circle" fill="#d1d1d1"/></button>
   </div>
   <ul id="todos">
@@ -17,26 +17,31 @@
       return {
         items: [
         ],
-        content: ""
+        content: "",
+        notes: ""
       }
     }, 
     mounted() {
-      if (localStorage.items) this.items = localStorage.items
+      if (localStorage.items) this.items = JSON.parse(localStorage.items)
     },
+
+    //TODO: apply watch properties to update localhost in changes
+    
     methods: {
       addTodo() {
         if (this.content.length > 0) {
           this.items.push({ message: this.content, mark: false })
+          localStorage.setItem("items", this.items)
           this.content = ""
         }
       },
       deleteTodo(t) {
-        console.log(t.target.id)
         this.items.splice(t.target.id, 1)
+        localStorage.setItem("items", this.items)
       },
       markTodo(t) {
         this.items[t.target.id].mark = this.items[t.target.id].mark == true ? false : true
-        console.log(this.items[t.target.id].mark)
+        localStorage.setItem("items", this.items)
       }
     },
   }
@@ -45,7 +50,7 @@
 <style scoped>
   .input {
     width: 300px;
-    height: 45px;
+    height: 50px;
     display: flex;
     box-shadow: 0px 5px 5px 0px rgba(0,0,0,0.05);
     border-radius: 10px;
@@ -60,13 +65,18 @@
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
   }
+
+  .input input::placeholder {
+    font-size: 14px;
+    opacity: 0.5;
+  }
   
   .input button{
     background-color: #fff;
     outline: none;
     border: none;
-    height: 45px;
-    width: 45px;
+    height: 50px;
+    width: 50px;
     padding: 5px;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -93,6 +103,7 @@
   #todos li {
     list-style: none;
     background-color: #fff;
+    cursor: pointer;
     position: relative;
     display: flex;
     align-items: center;
